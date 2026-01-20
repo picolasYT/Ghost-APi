@@ -3,6 +3,13 @@ import fetch from "node-fetch";
 
 const router = express.Router();
 
+// Instancias públicas (fallback)
+const INSTANCES = [
+  "https://piped.video",
+  "https://piped.adminforge.de",
+  "https://piped.kavin.rocks"
+];
+
 router.get("/", async (req, res) => {
   const { url } = req.query;
 
@@ -11,30 +18,47 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    // Extraer video ID
+    // Extraer ID
     const videoId = url.includes("youtu.be")
       ? url.split("youtu.be/")[1].split("?")[0]
-      : url.split("v=")[1].split("&")[0];
+      : url.split("v=")[1]?.split("&")[0];
 
-    const apiUrl = `https://piped.video/api/v1/streams/${videoId}`;
+    if (!videoId) {
+      return res.status(400).json({ error: "URL inválida" });
+    }
 
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    let data = null;
 
-    if (!response.ok) {
-      return res.status(500).json({
-        error: "No se pudo obtener el video"
+    for (const base of INSTANCES) {
+      try {
+        const apiUrl = `${base}/api/v1/streams/${videoId}`;
+        const r = await fetch(apiUrl, { timeout: 7000 });
+        if (r.ok) {
+          data = await r.json();
+          break;
+        }
+      } catch {}
+    }
+
+    if (!data) {
+      return res.status(503).json({
+        error: "No hay instancias disponibles"
       });
     }
 
-    // Respuesta limpia
     res.json({
       platform: "youtube",
       status: "success",
       title: data.title,
       duration: data.duration,
-      videoStreams: data.videoStreams?.slice(0, 3),
-      audioStreams: data.audioStreams?.slice(0, 3)
+      video: data.videoStreams?.map(v => ({
+        quality: v.quality,
+        url: v.url
+      })),
+      audio: data.audioStreams?.map(a => ({
+        bitrate: a.bitrate,
+        url: a.url
+      }))
     });
 
   } catch (err) {
