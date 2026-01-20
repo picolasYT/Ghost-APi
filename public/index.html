@@ -37,12 +37,33 @@
 </div>
 
     <!-- TIKTOK -->
-    <div class="card">
-      <h3>TikTok</h3>
-      <p>Downloader TikTok</p>
-      <button onclick="callApi('/api/download/tiktok?url=test')">GET</button>
-      <span class="status ready">ready</span>
+    <!-- ================= MODAL TIKTOK ================= -->
+<div id="ttModal" class="modal hidden">
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <h3>TikTok Downloader</h3>
+      <span class="close" onclick="closeTTModal()">×</span>
     </div>
+
+    <div class="modal-body">
+      <label>URL *</label>
+      <input
+        id="ttUrl"
+        type="text"
+        placeholder="https://www.tiktok.com/@user/video/..."
+      >
+
+      <button onclick="submitTT()">Submit 🚀</button>
+
+      <div id="ttStatus" class="status-text"></div>
+
+      <pre id="ttResponse"></pre>
+    </div>
+
+  </div>
+</div>
+<!-- ================================================= -->
 
   </div>
 
