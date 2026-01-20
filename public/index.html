@@ -44,6 +44,14 @@
       <span class="status ready">ready</span>
     </div>
 
+    <!-- INSTAGRAM -->
+<div class="card">
+  <h3>Instagram</h3>
+  <p>Downloader Reels / Posts</p>
+  <button onclick="openIGModal()">GET</button>
+  <span class="status ready">ready</span>
+</div>
+
   </div>
 </main>
 
@@ -74,6 +82,34 @@
   </div>
 </div>
 <!-- ================================================= -->
+
+<!-- ================= MODAL INSTAGRAM ================= -->
+<div id="igModal" class="modal hidden">
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <h3>Instagram Downloader</h3>
+      <span class="close" onclick="closeIGModal()">×</span>
+    </div>
+
+    <div class="modal-body">
+      <label>URL *</label>
+      <input
+        id="igUrl"
+        type="text"
+        placeholder="https://www.instagram.com/reel/..."
+      >
+
+      <button onclick="submitIG()">Submit 🚀</button>
+
+      <div id="igStatus" class="status-text"></div>
+
+      <pre id="igResponse"></pre>
+    </div>
+
+  </div>
+</div>
+<!-- =================================================== -->
 
 <script src="script.js"></script>
 </body>

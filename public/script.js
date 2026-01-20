@@ -143,3 +143,68 @@ async function submitTT() {
     output.textContent = "Error al procesar la solicitud";
   }
 }
+
+/* =========================
+   MODAL INSTAGRAM
+========================= */
+function openIGModal() {
+  document.getElementById("igModal").classList.remove("hidden");
+  document.getElementById("igStatus").textContent = "";
+  document.getElementById("igResponse").innerHTML = "";
+  document.getElementById("igUrl").value = "";
+}
+
+function closeIGModal() {
+  document.getElementById("igModal").classList.add("hidden");
+}
+
+/* =========================
+   SUBMIT INSTAGRAM
+========================= */
+async function submitIG() {
+  const urlInput = document.getElementById("igUrl");
+  const status = document.getElementById("igStatus");
+  const output = document.getElementById("igResponse");
+
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    status.textContent = "⚠️ Pegá una URL primero";
+    return;
+  }
+
+  status.textContent = "⏳ Processing request...";
+  output.innerHTML = "";
+
+  try {
+    const res = await fetch(
+      `/api/download/instagram?url=${encodeURIComponent(url)}`
+    );
+
+    const data = await res.json();
+
+    if (data.error) {
+      status.textContent = "❌ Error";
+      output.textContent = JSON.stringify(data, null, 2);
+      return;
+    }
+
+    status.textContent = "✅ Success";
+
+    output.innerHTML = `
+      <video controls style="width:100%;border-radius:12px;margin-top:10px;">
+        <source src="${data.video}" type="video/mp4">
+      </video>
+
+      <div style="margin-top:12px;">
+        <a href="${data.video}" target="_blank">
+          <button>📥 Download Video</button>
+        </a>
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Error";
+    output.textContent = "Error al procesar la solicitud";
+  }
+}
