@@ -7,6 +7,7 @@
 </head>
 <body>
 
+<!-- HERO -->
 <header class="hero">
   <div class="hero-content">
     <img src="https://qu.ax/OMjVv" class="logo" alt="Ghost API">
@@ -17,27 +18,60 @@
   </div>
 </header>
 
+<!-- CONTENIDO -->
 <main class="container">
   <h2>Downloader</h2>
 
   <div class="grid">
+
+    <!-- YOUTUBE -->
     <div class="card">
       <h3>YouTube</h3>
       <p>Downloader YouTube</p>
-      <button onclick="callApi('/api/download/youtube?url=test')">GET</button>
+      <button onclick="openYTModal()">GET</button>
       <span class="status ready">ready</span>
     </div>
 
+    <!-- TIKTOK -->
     <div class="card">
       <h3>TikTok</h3>
       <p>Downloader TikTok</p>
       <button onclick="callApi('/api/download/tiktok?url=test')">GET</button>
       <span class="status ready">ready</span>
     </div>
+
   </div>
 
   <pre id="output"></pre>
 </main>
+
+<!-- ================= MODAL YOUTUBE ================= -->
+<div id="ytModal" class="modal hidden">
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <h3>Ytmp3</h3>
+      <span class="close" onclick="closeYTModal()">×</span>
+    </div>
+
+    <div class="modal-body">
+      <label>URL *</label>
+      <input
+        id="ytUrl"
+        type="text"
+        placeholder="https://youtube.com/watch?v=..."
+      >
+
+      <button onclick="submitYT()">Submit 🚀</button>
+
+      <div id="ytStatus" class="status-text"></div>
+
+      <pre id="ytResponse"></pre>
+    </div>
+
+  </div>
+</div>
+<!-- ================================================= -->
 
 <script src="script.js"></script>
 </body>

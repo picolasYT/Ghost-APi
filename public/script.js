@@ -1,6 +1,84 @@
+/* =========================
+   UTILIDAD GENERAL (DEBUG)
+========================= */
 async function callApi(endpoint) {
-  const res = await fetch(endpoint);
-  const data = await res.json();
-  document.getElementById("output").textContent =
-    JSON.stringify(data, null, 2);
+  const output = document.getElementById("output");
+  output.textContent = "⏳ Processing request...";
+
+  try {
+    const res = await fetch(endpoint);
+    const data = await res.json();
+    output.textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    output.textContent = "❌ Error al llamar a la API";
+  }
 }
+
+/* =========================
+   MODAL YOUTUBE
+========================= */
+function openYTModal() {
+  document.getElementById("ytModal").classList.remove("hidden");
+  document.getElementById("ytStatus").textContent = "";
+  document.getElementById("ytResponse").textContent = "";
+  document.getElementById("ytUrl").value = "";
+}
+
+function closeYTModal() {
+  document.getElementById("ytModal").classList.add("hidden");
+}
+
+/* =========================
+   SUBMIT YOUTUBE
+========================= */
+async function submitYT() {
+  const urlInput = document.getElementById("ytUrl");
+  const status = document.getElementById("ytStatus");
+  const output = document.getElementById("ytResponse");
+
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    status.textContent = "⚠️ Pegá una URL primero";
+    return;
+  }
+
+  status.textContent = "⏳ Processing request...";
+  output.textContent = "";
+
+  try {
+    const res = await fetch(
+      `/api/download/youtube?url=${encodeURIComponent(url)}`
+    );
+
+    const data = await res.json();
+
+    if (data.error) {
+      status.textContent = "❌ Error";
+      output.textContent = JSON.stringify(data, null, 2);
+      return;
+    }
+
+    status.textContent = "✅ Success";
+    output.textContent = JSON.stringify(data, null, 2);
+
+    // Si querés auto abrir descarga cuando sea real:
+    // if (data.download) {
+    //   window.open(data.download, "_blank");
+    // }
+
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Error";
+    output.textContent = "Error al procesar la solicitud";
+  }
+}
+
+/* =========================
+   CERRAR MODAL CON ESC
+========================= */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeYTModal();
+  }
+});

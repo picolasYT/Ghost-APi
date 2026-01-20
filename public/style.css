@@ -175,3 +175,83 @@ pre {
   box-shadow: inset 0 0 30px rgba(0,255,180,.15);
   overflow-x: auto;
 }
+
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-box {
+  width: 420px;
+  background: #0b0c1a;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 0 60px rgba(108,99,255,.4);
+  animation: pop .3s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(.9); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: white;
+}
+
+.close {
+  cursor: pointer;
+  font-size: 22px;
+  color: #aaa;
+}
+
+.modal-body {
+  margin-top: 15px;
+}
+
+.modal-body label {
+  font-size: 13px;
+  color: #bbb;
+}
+
+.modal-body input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.modal-body button {
+  margin-top: 14px;
+  width: 100%;
+}
+
+.status-text {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+pre {
+  margin-top: 12px;
+  max-height: 180px;
+}
