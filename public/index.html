@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ghost API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="overlay"></div>
+
+  <div class="hero-content">
+    <img src="https://qu.ax/OMjVv" class="logo" alt="Ghost API">
+
+    <div>
+      <h1>Ghost API</h1>
+      <p>Downloader API simple y rápida</p>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <h2>Downloader</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>YouTube</h3>
+      <p>Downloader YouTube</p>
+      <button onclick="callApi('/api/download/youtube?url=test')">GET</button>
+      <span class="status ready">ready</span>
+    </div>
+
+    <div class="card">
+      <h3>TikTok</h3>
+      <p>Downloader TikTok</p>
+      <button onclick="callApi('/api/download/tiktok?url=test')">GET</button>
+      <span class="status ready">ready</span>
+    </div>
+  </div>
+
+  <pre id="output"></pre>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
