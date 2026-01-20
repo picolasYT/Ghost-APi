@@ -1,12 +1,15 @@
 {
   "name": "ghost-api",
   "version": "1.0.0",
+  "description": "Ghost API - Downloader API simple y rápida",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "bash install.sh"
   },
   "dependencies": {
-    "express": "^4.22.1"
+    "express": "^4.22.1",
+    "yt-dlp-wrap": "^2.3.12"
   }
 }

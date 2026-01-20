@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
+app.use("/files", express.static(process.cwd()));
 
 app.use("/api", apiRoutes);
 
