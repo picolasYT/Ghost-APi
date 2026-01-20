@@ -1,44 +1,48 @@
 import express from "express";
-import { exec } from "child_process";
-import path from "path";
+import fetch from "node-fetch";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   const { url } = req.query;
 
   if (!url) {
     return res.status(400).json({ error: "Falta el parámetro url" });
   }
 
-  // 👉 SI ESTÁS EN WINDOWS (LOCAL), DEVOLVEMOS MOCK
-  if (process.platform === "win32") {
-    return res.json({
-      platform: "youtube",
-      status: "mock",
-      message: "Descarga real solo en Render",
-      download: "https://example.com/video.mp4"
-    });
-  }
+  try {
+    // Extraer video ID
+    const videoId = url.includes("youtu.be")
+      ? url.split("youtu.be/")[1].split("?")[0]
+      : url.split("v=")[1].split("&")[0];
 
-  // 👉 MODO REAL (Render / Linux)
-  const fileName = `yt-${Date.now()}.mp4`;
-  const outputPath = path.join(process.cwd(), fileName);
+    const apiUrl = `https://piped.video/api/v1/streams/${videoId}`;
 
-  const cmd = `./yt-dlp -f mp4 -o "${outputPath}" "${url}"`;
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-  exec(cmd, (error) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Error descargando video" });
+    if (!response.ok) {
+      return res.status(500).json({
+        error: "No se pudo obtener el video"
+      });
     }
 
+    // Respuesta limpia
     res.json({
       platform: "youtube",
       status: "success",
-      download: `/files/${fileName}`
+      title: data.title,
+      duration: data.duration,
+      videoStreams: data.videoStreams?.slice(0, 3),
+      audioStreams: data.audioStreams?.slice(0, 3)
     });
-  });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error procesando la solicitud"
+    });
+  }
 });
 
 export default router;
