@@ -1,5 +1,5 @@
 import express from "express";
-import downloadRoutes from "./routes/downloader/index.js";
+import downloadRoutes from "./routes/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
