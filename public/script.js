@@ -32,14 +32,9 @@ function openYTModal() {
 
 function closeYTModal() {
   const modal = document.getElementById("ytModal");
-  if (!modal) return;
-
-  modal.classList.add("hidden");
+  if (modal) modal.classList.add("hidden");
 }
 
-/* =========================
-   SUBMIT YOUTUBE (SOLO INFO)
-========================= */
 async function submitYT() {
   const status = document.getElementById("ytStatus");
   const output = document.getElementById("ytResponse");
@@ -56,6 +51,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeYTModal();
     closeTTModal();
+    closeIGModal();
   }
 });
 
@@ -70,13 +66,19 @@ function openTTModal() {
   document.getElementById("ttStatus").textContent = "";
   document.getElementById("ttResponse").innerHTML = "";
   document.getElementById("ttUrl").value = "";
+  document.getElementById("ttEndpoint").value = "";
 }
 
 function closeTTModal() {
   const modal = document.getElementById("ttModal");
-  if (!modal) return;
+  if (modal) modal.classList.add("hidden");
+}
 
-  modal.classList.add("hidden");
+function copyTTEndpoint() {
+  const input = document.getElementById("ttEndpoint");
+  input.select();
+  input.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(input.value);
 }
 
 /* =========================
@@ -86,6 +88,7 @@ async function submitTT() {
   const urlInput = document.getElementById("ttUrl");
   const status = document.getElementById("ttStatus");
   const output = document.getElementById("ttResponse");
+  const endpointInput = document.getElementById("ttEndpoint");
 
   const url = urlInput.value.trim();
 
@@ -93,6 +96,10 @@ async function submitTT() {
     status.textContent = "⚠️ Pegá una URL primero";
     return;
   }
+
+  // Mostrar endpoint REAL (tu dominio)
+  endpointInput.value =
+    `https://ghost-api-wbqx.onrender.com/api/download/tiktok?url=${encodeURIComponent(url)}`;
 
   status.textContent = "⏳ Processing request...";
   output.innerHTML = "";
@@ -106,25 +113,32 @@ async function submitTT() {
 
     if (data.error) {
       status.textContent = "❌ Error";
-      output.textContent = JSON.stringify(data, null, 2);
+      output.innerHTML = `
+        <div style="color:#ffb4b4;">
+          ${data.error}
+        </div>
+      `;
       return;
     }
 
     status.textContent = "✅ Success";
 
+    const videoUrl = data.video_no_watermark || data.video;
+
     output.innerHTML = `
       <p><strong>Autor:</strong> ${data.author || "Desconocido"}</p>
+
       <p style="font-size:13px;color:#bbb;">
         ${data.description || ""}
       </p>
 
       <video controls style="width:100%;border-radius:12px;margin-top:10px;">
-        <source src="${data.video_no_watermark}" type="video/mp4">
+        <source src="${videoUrl}" type="video/mp4">
         Tu navegador no soporta video.
       </video>
 
       <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="${data.video_no_watermark}" target="_blank">
+        <a href="${videoUrl}" target="_blank">
           <button>📥 Download Video</button>
         </a>
 
@@ -145,66 +159,30 @@ async function submitTT() {
 }
 
 /* =========================
-   MODAL INSTAGRAM
+   MODAL INSTAGRAM (MAINTENANCE)
 ========================= */
 function openIGModal() {
-  document.getElementById("igModal").classList.remove("hidden");
-  document.getElementById("igStatus").textContent = "";
-  document.getElementById("igResponse").innerHTML = "";
+  const modal = document.getElementById("igModal");
+  if (!modal) return;
+
+  modal.classList.remove("hidden");
+  document.getElementById("igStatus").textContent =
+    "🚧 Instagram no disponible";
+  document.getElementById("igResponse").innerHTML =
+    "Instagram downloader está temporalmente deshabilitado.";
   document.getElementById("igUrl").value = "";
 }
 
 function closeIGModal() {
-  document.getElementById("igModal").classList.add("hidden");
+  const modal = document.getElementById("igModal");
+  if (modal) modal.classList.add("hidden");
 }
 
-/* =========================
-   SUBMIT INSTAGRAM
-========================= */
 async function submitIG() {
-  const urlInput = document.getElementById("igUrl");
   const status = document.getElementById("igStatus");
   const output = document.getElementById("igResponse");
 
-  const url = urlInput.value.trim();
-
-  if (!url) {
-    status.textContent = "⚠️ Pegá una URL primero";
-    return;
-  }
-
-  status.textContent = "⏳ Processing request...";
-  output.innerHTML = "";
-
-  try {
-    const res = await fetch(
-      `/api/download/instagram?url=${encodeURIComponent(url)}`
-    );
-
-    const data = await res.json();
-
-    if (data.error) {
-      status.textContent = "❌ Error";
-      output.textContent = JSON.stringify(data, null, 2);
-      return;
-    }
-
-    status.textContent = "✅ Success";
-
-    output.innerHTML = `
-      <video controls style="width:100%;border-radius:12px;margin-top:10px;">
-        <source src="${data.video}" type="video/mp4">
-      </video>
-
-      <div style="margin-top:12px;">
-        <a href="${data.video}" target="_blank">
-          <button>📥 Download Video</button>
-        </a>
-      </div>
-    `;
-  } catch (err) {
-    console.error(err);
-    status.textContent = "❌ Error";
-    output.textContent = "Error al procesar la solicitud";
-  }
+  status.textContent = "🚧 Instagram no disponible";
+  output.textContent =
+    "Este servicio está en mantenimiento por bloqueos de Instagram.";
 }

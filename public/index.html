@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Ghost API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- HERO -->
+<!-- ================= HERO ================= -->
 <header class="hero">
   <div class="hero-content">
     <img src="img/ghost.png" class="logo" alt="Ghost API">
@@ -18,7 +19,7 @@
   </div>
 </header>
 
-<!-- CONTENIDO -->
+<!-- ================= CONTENIDO ================= -->
 <main class="container">
   <h2>Downloader</h2>
 
@@ -28,12 +29,10 @@
     <div class="card">
       <h3>YouTube</h3>
       <p>Downloader YouTube</p>
-      <button disabled style="opacity:.6; cursor:not-allowed;">
+      <button disabled class="btn-disabled">
         Maintenance
       </button>
-      <span class="status" style="background:#ffb4b4;color:#900;">
-        maintenance
-      </span>
+      <span class="status maintenance">maintenance</span>
     </div>
 
     <!-- TIKTOK -->
@@ -45,12 +44,12 @@
     </div>
 
     <!-- INSTAGRAM -->
-<div class="card">
-  <h3>Instagram</h3>
-  <p>Downloader Reels / Posts</p>
-  <button onclick="openIGModal()">GET</button>
-  <span class="status ready">ready</span>
-</div>
+    <div class="card">
+      <h3>Instagram</h3>
+      <p>Downloader Reels / Posts</p>
+      <button onclick="openIGModal()">GET</button>
+      <span class="status ready">ready</span>
+    </div>
 
   </div>
 </main>
@@ -65,6 +64,7 @@
     </div>
 
     <div class="modal-body">
+
       <label>URL *</label>
       <input
         id="ttUrl"
@@ -74,9 +74,15 @@
 
       <button onclick="submitTT()">Submit 🚀</button>
 
-      <div id="ttStatus" class="status-text"></div>
+      <label style="margin-top:12px;">Endpoint</label>
+      <div class="endpoint-box">
+        <input id="ttEndpoint" type="text" readonly>
+        <button onclick="copyTTEndpoint()">📋</button>
+      </div>
 
-      <pre id="ttResponse"></pre>
+      <div id="ttStatus" class="status-text"></div>
+      <div id="ttResponse"></div>
+
     </div>
 
   </div>
@@ -93,6 +99,7 @@
     </div>
 
     <div class="modal-body">
+
       <label>URL *</label>
       <input
         id="igUrl"
@@ -103,8 +110,8 @@
       <button onclick="submitIG()">Submit 🚀</button>
 
       <div id="igStatus" class="status-text"></div>
+      <div id="igResponse"></div>
 
-      <pre id="igResponse"></pre>
     </div>
 
   </div>
