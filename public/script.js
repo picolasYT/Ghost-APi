@@ -163,26 +163,56 @@ async function submitTT() {
 ========================= */
 function openIGModal() {
   const modal = document.getElementById("igModal");
-  if (!modal) return;
-
   modal.classList.remove("hidden");
-  document.getElementById("igStatus").textContent =
-    "🚧 Instagram no disponible";
-  document.getElementById("igResponse").innerHTML =
-    "Instagram downloader está temporalmente deshabilitado.";
+  document.getElementById("igStatus").textContent = "";
+  document.getElementById("igResponse").innerHTML = "";
   document.getElementById("igUrl").value = "";
 }
 
 function closeIGModal() {
-  const modal = document.getElementById("igModal");
-  if (modal) modal.classList.add("hidden");
+  document.getElementById("igModal").classList.add("hidden");
 }
 
 async function submitIG() {
+  const url = document.getElementById("igUrl").value.trim();
   const status = document.getElementById("igStatus");
   const output = document.getElementById("igResponse");
 
-  status.textContent = "🚧 Instagram no disponible";
-  output.textContent =
-    "Este servicio está en mantenimiento por bloqueos de Instagram.";
+  if (!url) {
+    status.textContent = "⚠️ Pegá una URL primero";
+    return;
+  }
+
+  status.textContent = "⏳ Processing request...";
+  output.innerHTML = "";
+
+  try {
+    const res = await fetch(
+      `/api/download/instagram?url=${encodeURIComponent(url)}`
+    );
+    const data = await res.json();
+
+    if (data.error) {
+      status.textContent = "❌ Error";
+      output.textContent = data.error;
+      return;
+    }
+
+    status.textContent = "✅ Success";
+
+    output.innerHTML = `
+      <video controls style="width:100%;border-radius:12px;margin-top:10px;">
+        <source src="${data.video}" type="video/mp4">
+      </video>
+
+      <div style="margin-top:12px">
+        <a href="${data.video}" target="_blank">
+          <button>📥 Download Video</button>
+        </a>
+      </div>
+    `;
+  } catch (e) {
+    status.textContent = "❌ Error";
+    output.textContent = "Error conectando con Instagram";
+  }
 }

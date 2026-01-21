@@ -1,54 +1,45 @@
+import express from "express";
 import fetch from "node-fetch";
 
-export default async function instagram(req, res) {
-  const { username } = req.query;
+const router = express.Router();
 
-  if (!username) {
-    return res.status(400).json({ error: "Username requerido" });
+router.get("/", async (req, res) => {
+  const { url } = req.query;
+  if (!url) {
+    return res.json({ error: "Falta URL de Instagram" });
   }
 
   try {
     const response = await fetch(
-      "https://instagram120.p.rapidapi.com/api/instagram/posts",
+      "https://instagram120.p.rapidapi.com/api/instagram/media",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-rapidapi-host": "instagram120.p.rapidapi.com",
+          "x-rapidapi-host": process.env.RAPIDAPI_HOST,
           "x-rapidapi-key": process.env.RAPIDAPI_KEY
         },
         body: JSON.stringify({
-          username,
-          maxId: ""
+          url
         })
       }
     );
 
     const data = await response.json();
 
-    const post = data.items?.find(
-      (i) => i.video_versions && i.video_versions.length
-    );
-
-    if (!post) {
-      return res.status(404).json({
-        error: "No se encontraron videos"
-      });
+    if (!data || !data.video) {
+      return res.json({ error: "No se pudo obtener el video" });
     }
 
     res.json({
       platform: "instagram",
       status: "success",
-      author: username,
-      video: post.video_versions[0].url,
-      thumbnail:
-        post.image_versions2?.candidates?.[0]?.url || null
+      video: data.video
     });
-
   } catch (err) {
-    console.error("IG ERROR:", err.message);
-    res.status(503).json({
-      error: "Instagram no disponible en este momento"
-    });
+    console.error(err);
+    res.json({ error: "Error conectando con Instagram" });
   }
-}
+});
+
+export default router;
