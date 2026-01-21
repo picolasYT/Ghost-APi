@@ -29,9 +29,7 @@
     <div class="card">
       <h3>YouTube</h3>
       <p>Downloader YouTube</p>
-      <button disabled class="btn-disabled">
-        Maintenance
-      </button>
+      <button class="btn-disabled" disabled>Maintenance</button>
       <span class="status maintenance">maintenance</span>
     </div>
 
@@ -48,7 +46,7 @@
       <h3>Instagram</h3>
       <p>Downloader Reels / Posts</p>
       <button onclick="openIGModal()">GET</button>
-      <span class="status ready">ready</span>
+      <span class="status maintenance">maintenance</span>
     </div>
 
   </div>
@@ -74,13 +72,15 @@
 
       <button onclick="submitTT()">Submit 🚀</button>
 
-      <label style="margin-top:12px;">Endpoint</label>
+      <label style="margin-top:14px;">Endpoint</label>
       <div class="endpoint-box">
         <input id="ttEndpoint" type="text" readonly>
         <button onclick="copyTTEndpoint()">📋</button>
       </div>
 
       <div id="ttStatus" class="status-text"></div>
+
+      <!-- IMPORTANTE: DIV, NO PRE -->
       <div id="ttResponse"></div>
 
     </div>
