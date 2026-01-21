@@ -1,15 +1,16 @@
 import express from "express";
-import apiRoutes from "./routes/index.js";
+import "dotenv/config";
+import downloadRoutes from "./routes/downloader/index.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
-app.use("/files", express.static(process.cwd()));
 
-app.use("/api", apiRoutes);
+app.use("/api/download", downloadRoutes);
 
-app.listen(PORT, () => {
-  console.log("👻 Ghost API online en puerto", PORT);
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
+
+app.listen(process.env.PORT || 3000);

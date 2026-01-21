@@ -1,81 +1,54 @@
-import express from "express";
 import fetch from "node-fetch";
 
-const router = express.Router();
+export default async function instagram(req, res) {
+  const { username } = req.query;
 
-const PROVIDERS = [
-  // Provider 1
-  (url) => `https://igram.world/api/ig/media/?url=${encodeURIComponent(url)}`,
+  if (!username) {
+    return res.status(400).json({ error: "Username requerido" });
+  }
 
-  // Provider 2 (fallback)
-  (url) => `https://ddinstagram.com/reel/${extractReelId(url)}`
-];
-
-// Helper para sacar ID del reel
-function extractReelId(url) {
   try {
-    const match = url.match(/reel\/([^/?]+)/);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
-}
+    const response = await fetch(
+      "https://instagram120.p.rapidapi.com/api/instagram/posts",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-rapidapi-host": "instagram120.p.rapidapi.com",
+          "x-rapidapi-key": process.env.RAPIDAPI_KEY
+        },
+        body: JSON.stringify({
+          username,
+          maxId: ""
+        })
+      }
+    );
 
-router.get("/", async (req, res) => {
-  const { url } = req.query;
+    const data = await response.json();
 
-  if (!url) {
-    return res.status(400).json({ error: "Falta el parámetro url" });
-  }
+    const post = data.items?.find(
+      (i) => i.video_versions && i.video_versions.length
+    );
 
-  // Solo reels por ahora
-  if (!url.includes("/reel/")) {
-    return res.status(400).json({
-      error: "Solo se soportan links de Instagram Reels"
+    if (!post) {
+      return res.status(404).json({
+        error: "No se encontraron videos"
+      });
+    }
+
+    res.json({
+      platform: "instagram",
+      status: "success",
+      author: username,
+      video: post.video_versions[0].url,
+      thumbnail:
+        post.image_versions2?.candidates?.[0]?.url || null
+    });
+
+  } catch (err) {
+    console.error("IG ERROR:", err.message);
+    res.status(503).json({
+      error: "Instagram no disponible en este momento"
     });
   }
-
-  for (const buildUrl of PROVIDERS) {
-    try {
-      const apiUrl = buildUrl(url);
-      if (!apiUrl) continue;
-
-      const r = await fetch(apiUrl, { timeout: 8000 });
-
-      // Provider 1 (JSON)
-      if (r.ok && apiUrl.includes("igram.world")) {
-        const data = await r.json();
-        if (data?.medias?.length) {
-          return res.json({
-            platform: "instagram",
-            status: "success",
-            video: data.medias[0].url,
-            thumbnail: data.medias[0].thumbnail
-          });
-        }
-      }
-
-      // Provider 2 (HTML scrape simple)
-      if (r.ok && apiUrl.includes("ddinstagram")) {
-        const html = await r.text();
-        const match = html.match(/href="(https:\/\/[^"]+\.mp4[^"]*)"/);
-        if (match) {
-          return res.json({
-            platform: "instagram",
-            status: "success",
-            video: match[1]
-          });
-        }
-      }
-    } catch (e) {
-      // seguimos al siguiente provider
-    }
-  }
-
-  // Si ninguno respondió
-  res.status(503).json({
-    error: "Instagram no disponible en este momento"
-  });
-});
-
-export default router;
+}
