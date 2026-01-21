@@ -2,33 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Crear cuenta - Ghost API</title>
+  <title>Register – Ghost API</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="center">
+<body class="auth-bg">
 
-  <div class="box">
+  <div class="auth-card">
     <h2>👻 Crear cuenta</h2>
 
-    <input
-      id="email"
-      type="email"
-      placeholder="Email"
-    >
-
-    <input
-      id="password"
-      type="password"
-      placeholder="Password"
-    >
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <input id="password2" type="password" placeholder="Repetir password">
 
     <button onclick="register()">Crear cuenta</button>
 
-    <p id="status" class="status-text"></p>
+    <p id="error" class="error"></p>
 
-    <p style="margin-top:12px;font-size:14px;">
+    <p class="link">
       ¿Ya tenés cuenta?
-      <a href="/login.html">Login</a>
+      <a href="/login.html">Iniciar sesión</a>
     </p>
   </div>
 
@@ -36,14 +28,20 @@
 function register() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  const status = document.getElementById("status");
+  const password2 = document.getElementById("password2").value.trim();
+  const error = document.getElementById("error");
 
-  if (!email || !password) {
-    status.textContent = "⚠️ Completá todos los campos";
+  if (!email || !password || !password2) {
+    error.textContent = "Completá todos los campos";
     return;
   }
 
-  status.textContent = "⏳ Creando cuenta...";
+  if (password !== password2) {
+    error.textContent = "Las contraseñas no coinciden";
+    return;
+  }
+
+  error.textContent = "⏳ Creando cuenta...";
 
   fetch("/api/auth/register", {
     method: "POST",
@@ -53,17 +51,15 @@ function register() {
     .then(res => res.json())
     .then(data => {
       if (data.error) {
-        status.textContent = "❌ " + data.error;
+        error.textContent = data.error;
         return;
       }
 
-      status.textContent = "✅ Cuenta creada. Ya podés iniciar sesión.";
-      setTimeout(() => {
-        window.location.href = "/login.html";
-      }, 1200);
+      alert("✅ Cuenta creada, ahora iniciá sesión");
+      window.location.href = "/login.html";
     })
     .catch(() => {
-      status.textContent = "❌ Error creando la cuenta";
+      error.textContent = "Error creando la cuenta";
     });
 }
 </script>

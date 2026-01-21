@@ -1,28 +1,31 @@
 import express from "express";
-import bcrypt from "bcrypt";
-import db from "../../db/index.js";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
+
+const users = []; // luego DB
 
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: "Email y password requeridos" });
+    return res.json({ error: "Datos incompletos" });
+  }
+
+  const exists = users.find(u => u.email === email);
+  if (exists) {
+    return res.json({ error: "El email ya existe" });
   }
 
   const hash = await bcrypt.hash(password, 10);
 
-  try {
-    await db.run(
-      "INSERT INTO users (email, password) VALUES (?, ?)",
-      [email, hash]
-    );
+  users.push({
+    email,
+    password: hash,
+    role: "user"
+  });
 
-    res.json({ success: true });
-  } catch (e) {
-    res.status(400).json({ error: "Usuario ya existe" });
-  }
+  res.json({ ok: true });
 });
 
 export default router;
