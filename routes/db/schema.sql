@@ -1,10 +1,9 @@
-import express from "express";
-import auth from "../../middleware/auth.js";
-
-const router = express.Router();
-
-router.get("/", auth, (req, res) => {
-  res.json(req.user);
-});
-
-export default router;
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  role TEXT DEFAULT 'user',
+  api_key TEXT UNIQUE,
+  requests_today INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
