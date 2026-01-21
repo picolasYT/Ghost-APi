@@ -253,3 +253,94 @@ pre {
   margin-top: 12px;
   max-height: 180px;
 }
+
+/* ===== AUTH ===== */
+.auth-bg {
+  height: 100vh;
+  background: radial-gradient(circle at top, #1b1f3b, #050510);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-card {
+  background: rgba(0,0,0,0.6);
+  padding: 32px;
+  border-radius: 16px;
+  width: 320px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 0 30px rgba(111,108,255,0.3);
+}
+
+.auth-card h2 {
+  margin-bottom: 20px;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: none;
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #6f6cff;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.auth-card button:hover {
+  background: #5a57e6;
+}
+
+.error {
+  margin-top: 10px;
+  color: #ff8080;
+}
+
+.link {
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+/* ===== DASHBOARD ===== */
+.dashboard-bg {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #141833, #050510);
+  color: white;
+}
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.dash-header button {
+  background: #ff5f5f;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: white;
+  cursor: pointer;
+}
+
+.dash-container {
+  padding: 30px;
+}
+
+.dash-card {
+  margin-top: 20px;
+  background: rgba(0,0,0,0.5);
+  padding: 20px;
+  border-radius: 14px;
+  max-width: 400px;
+}

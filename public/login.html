@@ -2,27 +2,39 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ghost API Login</title>
+  <title>Login – Ghost API</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="center">
+<body class="auth-bg">
 
-  <div class="box">
+  <div class="auth-card">
     <h2>👻 Login Ghost API</h2>
 
-    <input id="email" placeholder="Email">
+    <input id="email" type="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
 
-    <button onclick="loginUser()">Login</button>
+    <button onclick="login()">Login</button>
 
     <p id="error" class="error"></p>
+
+    <p class="link">
+      ¿No tenés cuenta?
+      <a href="/register.html">Crear cuenta</a>
+    </p>
   </div>
 
 <script>
-function loginUser() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
   const error = document.getElementById("error");
+
+  if (!email || !password) {
+    error.textContent = "Completá todos los campos";
+    return;
+  }
+
+  error.textContent = "⏳ Iniciando sesión...";
 
   fetch("/api/auth/login", {
     method: "POST",
@@ -35,8 +47,12 @@ function loginUser() {
         error.textContent = data.error;
         return;
       }
+
       localStorage.setItem("token", data.token);
-      alert("Login correcto ✅");
+      window.location.href = "/dashboard.html";
+    })
+    .catch(() => {
+      error.textContent = "Error al iniciar sesión";
     });
 }
 </script>

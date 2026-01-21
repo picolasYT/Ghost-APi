@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard – Ghost API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-bg">
+
+  <header class="dash-header">
+    <h2>👻 Ghost API</h2>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <main class="dash-container">
+    <h3>Bienvenido</h3>
+    <p id="userEmail"></p>
+
+    <div class="dash-card">
+      <h4>📊 Estado de tu cuenta</h4>
+      <p>Requests diarios: <strong>500 / día</strong></p>
+      <p id="requestsToday">Cargando...</p>
+    </div>
+  </main>
+
+<script>
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "/login.html";
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
+
+fetch("/api/auth/me", {
+  headers: {
+    Authorization: "Bearer " + token
+  }
+})
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      logout();
+      return;
+    }
+    document.getElementById("userEmail").textContent = data.email;
+  });
+
+document.getElementById("requestsToday").textContent =
+  "Límite activo (veremos stats en breve)";
+</script>
+
+</body>
+</html>
