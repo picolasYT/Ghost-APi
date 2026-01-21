@@ -1,12 +1,13 @@
-import { Router } from "express";
-import tiktok from "./tiktok.js";
-import instagram from "./instagram.js";
-import youtube from "./youtube.js";
+import express from "express";
 
-const router = Router();
+import tiktok from "./downloader/tiktok.js";
+import instagram from "./downloader/instagram.js";
+import youtube from "./downloader/youtube.js";
 
-router.get("/tiktok", tiktok);
-router.get("/instagram", instagram);
-router.get("/youtube", youtube);
+const router = express.Router();
+
+router.use("/download/tiktok", tiktok);
+router.use("/download/instagram", instagram);
+router.use("/download/youtube", youtube);
 
 export default router;
