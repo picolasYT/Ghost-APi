@@ -216,3 +216,17 @@ async function submitIG() {
     output.textContent = "Error conectando con Instagram";
   }
 }
+
+function goRegister() {
+  alert(
+    "El registro se hace por API por ahora.\n\nPOST /api/auth/register"
+  );
+}
+
+function goLogin() {
+  window.location.href = "/admin/login.html";
+}
+
+function goAdmin() {
+  window.location.href = "/admin/login.html";
+}
