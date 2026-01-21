@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ghost API Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="center">
+
+  <div class="box">
+    <h2>👻 Login Ghost API</h2>
+
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="loginUser()">Login</button>
+
+    <p id="error" class="error"></p>
+  </div>
+
+<script>
+function loginUser() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const error = document.getElementById("error");
+
+  fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        error.textContent = data.error;
+        return;
+      }
+      localStorage.setItem("token", data.token);
+      alert("Login correcto ✅");
+    });
+}
+</script>
+
+</body>
+</html>

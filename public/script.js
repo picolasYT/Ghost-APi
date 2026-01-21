@@ -218,15 +218,13 @@ async function submitIG() {
 }
 
 function goRegister() {
-  alert(
-    "El registro se hace por API por ahora.\n\nPOST /api/auth/register"
-  );
+  alert("Registro por ahora vía API:\nPOST /api/auth/register");
 }
 
 function goLogin() {
-  window.location.href = "/admin/login.html";
+  window.location.href = "/login.html"; // 👤 USUARIO
 }
 
 function goAdmin() {
-  window.location.href = "/admin/login.html";
+  window.location.href = "/admin/login.html"; // 🛠 ADMIN
 }
