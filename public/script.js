@@ -218,7 +218,7 @@ async function submitIG() {
 }
 
 function goRegister() {
-  alert("Registro por ahora vía API:\nPOST /api/auth/register");
+  window.location.href = "/register.html"; // 👤 USUARIO
 }
 
 function goLogin() {
