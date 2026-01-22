@@ -1,40 +1,35 @@
 import express from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import db from "../../db/index.js";
+import { pool } from "../../db.js";
 
 const router = express.Router();
-
-const JWT_SECRET = process.env.JWT_SECRET || "ghost_secret";
 
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email y password requeridos" });
-  }
-
-  const user = await db.get(
-    "SELECT * FROM users WHERE email = ?",
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email=$1",
     [email]
   );
 
-  if (!user) {
-    return res.status(401).json({ error: "Credenciales inválidas" });
-  }
+  const user = result.rows[0];
+  if (!user) return res.json({ error: "Credenciales inválidas" });
 
   const ok = await bcrypt.compare(password, user.password);
-  if (!ok) {
-    return res.status(401).json({ error: "Credenciales inválidas" });
-  }
+  if (!ok) return res.json({ error: "Credenciales inválidas" });
 
   const token = jwt.sign(
-    { id: user.id, email: user.email },
-    JWT_SECRET,
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
 
-  res.json({ token });
+  res.json({
+    token,
+    api_key: user.api_key,
+    role: user.role
+  });
 });
 
 export default router;

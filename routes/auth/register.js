@@ -1,9 +1,9 @@
 import express from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { pool } from "../../db.js";
 
 const router = express.Router();
-
-const users = []; // luego DB
 
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
@@ -12,20 +12,24 @@ router.post("/", async (req, res) => {
     return res.json({ error: "Datos incompletos" });
   }
 
-  const exists = users.find(u => u.email === email);
-  if (exists) {
-    return res.json({ error: "El email ya existe" });
+  try {
+    const hash = await bcrypt.hash(password, 10);
+    const apiKey = crypto.randomBytes(24).toString("hex");
+
+    await pool.query(
+      "INSERT INTO users (email, password, api_key) VALUES ($1,$2,$3)",
+      [email, hash, apiKey]
+    );
+
+    res.json({ ok: true });
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.json({ error: "El email ya existe" });
+    }
+
+    console.error(err);
+    res.json({ error: "Error creando la cuenta" });
   }
-
-  const hash = await bcrypt.hash(password, 10);
-
-  users.push({
-    email,
-    password: hash,
-    role: "user"
-  });
-
-  res.json({ ok: true });
 });
 
 export default router;
