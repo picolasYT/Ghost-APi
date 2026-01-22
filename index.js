@@ -5,6 +5,7 @@ import apiRoutes from "./routes/index.js";
 import auth from "./middleware/auth.js";
 import rateLimit from "./middleware/rateLimit.js";
 import logRequest from "./middleware/log.js";
+import { initDb } from "./initDb.js";
 
 /* =========================
    CARGAR VARIABLES (.env)
@@ -31,8 +32,18 @@ app.use(express.json());
 app.use(express.static("public"));
 
 /* =========================
-   RUTAS API (PROTEGIDAS)
+   INIT DATABASE (🔥 CLAVE 🔥)
 ========================= */
+await initDb();
+
+/* =========================
+   RUTAS API
+========================= */
+
+/* 🔓 AUTH (NO protegidas) */
+app.use("/api/auth", apiRoutes);
+
+/* 🔒 DOWNLOAD (protegidas) */
 app.use(
   "/api/download",
   auth,
