@@ -1,4 +1,4 @@
-import db from "./db/index.js";
+import { pool } from "../db.js";
 
 export default async function logRequest(req, res, next) {
   res.on("finish", async () => {

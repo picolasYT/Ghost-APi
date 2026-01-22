@@ -1,4 +1,4 @@
-import db from "./db/index.js";
+import { pool } from "../db.js";
 
 const DAILY_LIMIT = 500;
 
