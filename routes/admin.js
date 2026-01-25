@@ -17,15 +17,21 @@ router.get("/login", (req, res) => {
 router.post("/login", (req, res) => {
   const { password } = req.body;
 
-  if (password === process.env.ADMIN_PASSWORD) {
-    res.cookie("admin", "true", {
-      httpOnly: true,
-      sameSite: "strict"
-    });
-    return res.redirect("/admin/dashboard.html");
+  if (!password) {
+    return res.redirect("/admin/login.html?error=1");
   }
 
-  res.redirect("/admin/login.html?error=1");
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.redirect("/admin/login.html?error=1");
+  }
+
+  // Cookie válida
+  res.cookie("admin", "ok", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+
+  res.redirect("/admin/dashboard.html");
 });
 
 /* ======================
@@ -47,12 +53,13 @@ router.get("/", adminAuth, (req, res) => {
    LOGS (PROTEGIDO)
 ====================== */
 router.get("/logs", adminAuth, (req, res) => {
-  res.json(logs.reverse());
+  res.json([...logs].reverse());
 });
 
-export default router;
-
-router.get("/stats", (req, res) => {
+/* ======================
+   STATS (PROTEGIDO)
+====================== */
+router.get("/stats", adminAuth, (req, res) => {
   const stats = {};
 
   logs.forEach(l => {
@@ -61,3 +68,5 @@ router.get("/stats", (req, res) => {
 
   res.json(stats);
 });
+
+export default router;

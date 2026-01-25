@@ -53,5 +53,14 @@
 <!-- ================= JS ================= -->
 <script src="/admin/admin.js"></script>
 
+<script>
+fetch("/api/admin/logs")
+  .then(res => {
+    if (res.status === 401) {
+      location.href = "/admin/login.html";
+    }
+  });
+</script>
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 export default function adminAuth(req, res, next) {
-  if (req.cookies?.admin === "true") {
+  if (req.cookies?.admin === "ok") {
     return next();
   }
 
-  res.redirect("/admin/login.html");
+  return res.status(401).json({ error: "No autorizado" });
 }
