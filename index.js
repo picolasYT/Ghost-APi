@@ -2,7 +2,6 @@ import express from "express";
 import apiRoutes from "./routes/index.js";
 import logRequest from "./middleware/log.js";
 import adminRoutes from "./routes/admin.js";
-import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +9,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
-app.use(cookieParser());
 
 /* API pública */
 app.use("/api", logRequest, apiRoutes);

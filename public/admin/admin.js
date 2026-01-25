@@ -1,8 +1,35 @@
 /* =========================
+   AUTH
+========================= */
+
+const token = localStorage.getItem("adminToken");
+
+if (!token) {
+  location.href = "/admin/login.html";
+}
+
+/* helper fetch con auth */
+async function authFetch(url) {
+  const res = await fetch(url, {
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    localStorage.removeItem("adminToken");
+    location.href = "/admin/login.html";
+    return null;
+  }
+
+  return res;
+}
+
+/* =========================
    UTILIDADES
 ========================= */
 
-// Convertir country code a emoji 🇦🇷 🇺🇸 etc
+// Convertir country code a emoji 🇦🇷 🇺🇸
 function flagEmoji(code) {
   if (!code || code === "XX") return "🏳️";
   return code
@@ -12,7 +39,6 @@ function flagEmoji(code) {
     );
 }
 
-// Formatear hora
 function formatTime(date) {
   return new Date(date).toLocaleTimeString();
 }
@@ -21,10 +47,11 @@ function formatTime(date) {
    LOGS
 ========================= */
 async function loadLogs() {
-  const res = await fetch("/api/admin/logs");
+  const res = await authFetch("/api/admin/logs");
+  if (!res) return;
+
   const data = await res.json();
 
-  // Total requests
   const totalEl = document.getElementById("total");
   if (totalEl) totalEl.textContent = data.length;
 
@@ -37,12 +64,10 @@ async function loadLogs() {
 
     div.innerHTML = `
       <div class="flag">${flagEmoji(log.country)}</div>
-
       <div class="info">
         <strong>${log.method}</strong> ${log.path}<br/>
         <small>${log.ip} • ${log.ua}</small>
       </div>
-
       <div class="time">${formatTime(log.time)}</div>
     `;
 
@@ -51,10 +76,12 @@ async function loadLogs() {
 }
 
 /* =========================
-   STATS POR ENDPOINT
+   STATS
 ========================= */
 async function loadStats() {
-  const res = await fetch("/api/admin/stats");
+  const res = await authFetch("/api/admin/stats");
+  if (!res) return;
+
   const stats = await res.json();
 
   const ul = document.getElementById("endpointList");
@@ -70,12 +97,14 @@ async function loadStats() {
 }
 
 /* =========================
-   GRÁFICO
+   CHART
 ========================= */
 let chart;
 
 async function loadChart() {
-  const res = await fetch("/api/admin/stats");
+  const res = await authFetch("/api/admin/stats");
+  if (!res) return;
+
   const data = await res.json();
 
   const canvas = document.getElementById("chart");
@@ -97,20 +126,14 @@ async function loadChart() {
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
     }
   });
 }
 
 /* =========================
-   REFRESH
+   INIT
 ========================= */
 async function refreshAll() {
   await loadLogs();
@@ -118,9 +141,4 @@ async function refreshAll() {
   await loadChart();
 }
 
-/* =========================
-   INIT
-========================= */
-document.addEventListener("DOMContentLoaded", () => {
-  refreshAll();
-});
+document.addEventListener("DOMContentLoaded", refreshAll);

@@ -12,10 +12,10 @@
     <h1>👻 Ghost API</h1>
     <p class="subtitle">Admin Panel</p>
 
-    <form method="POST" action="/admin/login">
+    <form id="loginForm">
       <input
         type="password"
-        name="password"
+        id="password"
         placeholder="Contraseña de administrador"
         required
         autofocus
@@ -28,12 +28,36 @@
   </div>
 
   <script>
-    // Mostrar error si viene ?error=1
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("error")) {
-      document.getElementById("error").textContent =
-        "❌ Contraseña incorrecta";
-    }
+    const form = document.getElementById("loginForm");
+    const errorEl = document.getElementById("error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl.textContent = "";
+
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorEl.textContent = "❌ Contraseña incorrecta";
+          return;
+        }
+
+        localStorage.setItem("adminToken", data.token);
+        location.href = "/admin/dashboard.html";
+
+      } catch (err) {
+        errorEl.textContent = "❌ Error al conectar con el servidor";
+      }
+    });
   </script>
 
 </body>

@@ -4,43 +4,44 @@ import { logs } from "../middleware/log.js";
 
 const router = express.Router();
 
-/* LOGIN FORM */
-router.get("/login", (req, res) => {
-  res.sendFile(process.cwd() + "/public/admin/login.html");
-});
-
-/* LOGIN POST */
+/* =========================
+   LOGIN (POST)
+========================= */
 router.post("/login", (req, res) => {
   const { password } = req.body;
 
-  if (password === process.env.ADMIN_PASSWORD) {
-    res.cookie("admin", "ok", {
-      httpOnly: true,
-      sameSite: "strict",
-    });
-    return res.redirect("/admin/dashboard.html");
+  if (!password) {
+    return res.status(400).json({ error: "Falta password" });
   }
 
-  res.redirect("/admin/login.html?error=1");
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Password incorrecta" });
+  }
+
+  // token simple (suficiente para admin)
+  return res.json({
+    token: process.env.ADMIN_TOKEN || "ghost-admin-token"
+  });
 });
 
-/* LOGOUT */
-router.get("/logout", (req, res) => {
-  res.clearCookie("admin");
-  res.redirect("/admin/login.html");
+/* =========================
+   LOGOUT (frontend only)
+========================= */
+router.post("/logout", (req, res) => {
+  // no hay sesión en backend
+  res.json({ ok: true });
 });
 
-/* DASHBOARD */
-router.get("/", adminAuth, (req, res) => {
-  res.sendFile(process.cwd() + "/public/admin/dashboard.html");
-});
-
-/* LOGS */
+/* =========================
+   LOGS
+========================= */
 router.get("/logs", adminAuth, (req, res) => {
-  res.json(logs.reverse());
+  res.json([...logs].reverse());
 });
 
-/* STATS */
+/* =========================
+   STATS
+========================= */
 router.get("/stats", adminAuth, (req, res) => {
   const stats = {};
   logs.forEach(l => {
@@ -49,4 +50,4 @@ router.get("/stats", adminAuth, (req, res) => {
   res.json(stats);
 });
 
-export default router; // ⬅️ ESTO ERA LO QUE FALTABA
+export default router;
