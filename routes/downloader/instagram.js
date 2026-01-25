@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const api = `https://savefrom.net/api/ig?url=${encodeURIComponent(url)}`;
+    const api = `https://ssyoutube.com/api/instagram?url=${encodeURIComponent(url)}`;
     const response = await fetch(api);
     const data = await response.json();
 
