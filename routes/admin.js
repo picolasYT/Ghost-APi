@@ -51,3 +51,13 @@ router.get("/logs", adminAuth, (req, res) => {
 });
 
 export default router;
+
+router.get("/stats", (req, res) => {
+  const stats = {};
+
+  logs.forEach(l => {
+    stats[l.path] = (stats[l.path] || 0) + 1;
+  });
+
+  res.json(stats);
+});

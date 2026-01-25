@@ -2,28 +2,56 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Ghost API — Admin</title>
+  <title>👻 Ghost API — Admin</title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="/admin/admin.css" />
+
+  <!-- Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
+<!-- ================= HEADER ================= -->
 <header class="top">
-  <h1>👻 Ghost API — Admin</h1>
-  <button onclick="loadLogs()">🔄 Actualizar</button>
+  <h1>👻 Ghost API — Admin Panel</h1>
+
+  <button class="btn-refresh" onclick="refreshAll()">
+    🔄 Actualizar
+  </button>
 </header>
 
+<!-- ================= STATS ================= -->
 <section class="stats">
+
   <div class="card">
     <h3>Total Requests</h3>
     <span id="total">0</span>
   </div>
+
+  <div class="card">
+    <h3>Endpoints</h3>
+    <ul id="endpointList"></ul>
+  </div>
+
+  <div class="card chart">
+    <h3>Requests por Endpoint</h3>
+    <canvas id="chart"></canvas>
+  </div>
+
 </section>
 
+<!-- ================= LOGS ================= -->
 <section class="logs">
-  <h2>Últimas peticiones</h2>
-  <div id="logList"></div>
+  <h2>Últimos accesos</h2>
+
+  <div id="logList" class="log-list">
+    <!-- logs dinámicos -->
+  </div>
 </section>
 
+<!-- ================= JS ================= -->
 <script src="/admin/admin.js"></script>
+
 </body>
 </html>

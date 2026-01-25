@@ -1,19 +1,23 @@
-const logs = [];
+import geoip from "geoip-lite";
+
+export const logs = [];
 
 export default function logRequest(req, res, next) {
+  const ip =
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.socket.remoteAddress;
+
+  const geo = geoip.lookup(ip);
+  const country = geo?.country || "XX";
+
   logs.push({
-    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+    ip,
+    country,              // 👈 NUEVO
     path: req.originalUrl,
     method: req.method,
     ua: req.headers["user-agent"],
     time: new Date().toISOString()
   });
 
-  // mantener solo últimos 500
-  if (logs.length > 500) logs.shift();
-
-  req.logs = logs;
   next();
 }
-
-export { logs };

@@ -13,6 +13,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
+    "geoip-lite": "^1.4.10",
     "jsonwebtoken": "^9.0.3",
     "node-fetch": "^3.3.2",
     "pg": "^8.17.2",
