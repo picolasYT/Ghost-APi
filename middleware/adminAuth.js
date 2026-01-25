@@ -1,13 +1,13 @@
 export default function adminAuth(req, res, next) {
   const auth = req.headers.authorization;
 
-  if (!auth || !auth.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "No autorizado" });
+  if (!auth) {
+    return res.status(401).json({ error: "No auth header" });
   }
 
-  const token = auth.split(" ")[1];
+  const token = auth.replace("Bearer ", "");
 
-  if (token !== (process.env.ADMIN_TOKEN || "ghost-admin-token")) {
+  if (token !== process.env.ADMIN_TOKEN) {
     return res.status(403).json({ error: "Token inválido" });
   }
 

@@ -1,64 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ghost API — Admin Login</title>
-  <link rel="stylesheet" href="/admin.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Ghost Admin</title>
 </head>
-<body class="login-page">
+<body>
 
-  <div class="login-box">
-    <h1>👻 Ghost API</h1>
-    <p class="subtitle">Admin Panel</p>
+<h2>Login Admin</h2>
 
-    <form id="loginForm">
-      <input
-        type="password"
-        id="password"
-        placeholder="Contraseña de administrador"
-        required
-        autofocus
-      />
+<input id="password" type="password" placeholder="password">
+<button id="btn">Entrar</button>
 
-      <button type="submit">🔐 Ingresar</button>
-    </form>
+<p id="error"></p>
 
-    <p id="error" class="error"></p>
-  </div>
+<script>
+document.getElementById("btn").onclick = async () => {
+  const password = document.getElementById("password").value;
 
-  <script>
-    const form = document.getElementById("loginForm");
-    const errorEl = document.getElementById("error");
+  const res = await fetch("/admin/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errorEl.textContent = "";
+  const data = await res.json();
 
-      const password = document.getElementById("password").value;
+  if (!res.ok) {
+    document.getElementById("error").textContent = "Password incorrecta";
+    return;
+  }
 
-      try {
-        const res = await fetch("/admin/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          errorEl.textContent = "❌ Contraseña incorrecta";
-          return;
-        }
-
-        localStorage.setItem("adminToken", data.token);
-        location.href = "/admin/dashboard.html";
-
-      } catch (err) {
-        errorEl.textContent = "❌ Error al conectar con el servidor";
-      }
-    });
-  </script>
+  localStorage.setItem("adminToken", data.token);
+  location.href = "/admin/dashboard.html";
+};
+</script>
 
 </body>
 </html>
