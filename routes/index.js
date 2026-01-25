@@ -1,22 +1,15 @@
 import express from "express";
-
+import adminRoutes from "./admin.js";
 import tiktok from "./downloader/tiktok.js";
 import instagram from "./downloader/instagram.js";
 import youtube from "./downloader/youtube.js";
-import adminRoutes from "./admin.js";
 
 const router = express.Router();
 
-/* =========================
-   DOWNLOADERS
-========================= */
 router.use("/download/tiktok", tiktok);
 router.use("/download/instagram", instagram);
 router.use("/download/youtube", youtube);
 
-/* =========================
-   ADMIN PANEL
-========================= */
-router.use("/admin", adminRoutes);
+router.use("/admin", adminRoutes); // SOLO API
 
 export default router;

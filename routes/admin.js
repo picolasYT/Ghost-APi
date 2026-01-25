@@ -22,7 +22,7 @@ router.post("/login", (req, res) => {
       httpOnly: true,
       sameSite: "strict"
     });
-    return res.redirect("/api/admin");
+    return res.redirect("/admin/dashboard.html");
   }
 
   res.redirect("/admin/login.html?error=1");

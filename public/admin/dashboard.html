@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ghost API Admin</title>
-  <link rel="stylesheet" href="admin.css">
+  <meta charset="UTF-8" />
+  <title>Ghost API — Admin</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
 
-<h1>👻 Ghost API — Admin</h1>
+<header class="top">
+  <h1>👻 Ghost API — Admin</h1>
+  <button onclick="loadLogs()">🔄 Actualizar</button>
+</header>
 
-<button onclick="loadLogs()">🔄 Actualizar</button>
+<section class="stats">
+  <div class="card">
+    <h3>Total Requests</h3>
+    <span id="total">0</span>
+  </div>
+</section>
 
-<pre id="logs"></pre>
+<section class="logs">
+  <h2>Últimas peticiones</h2>
+  <div id="logList"></div>
+</section>
 
-<script>
-async function loadLogs() {
-  const res = await fetch("/admin/logs");
-  const data = await res.json();
-  document.getElementById("logs").textContent =
-    JSON.stringify(data, null, 2);
-}
-
-loadLogs();
-</script>
-
+<script src="/admin/admin.js"></script>
 </body>
 </html>

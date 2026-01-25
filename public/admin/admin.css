@@ -1,55 +1,60 @@
 body {
-  background: #0f0f0f;
-  color: #eee;
+  background: #0f1220;
+  color: #fff;
   font-family: system-ui;
+  margin: 0;
 }
 
-.center {
+.top {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.box {
-  background: #1a1a1a;
-  padding: 30px;
-  border-radius: 12px;
-  width: 300px;
-}
-
-input {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
+  justify-content: space-between;
+  padding: 20px;
+  background: #151933;
 }
 
 button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #6f6cff;
+  background: #6c63ff;
   border: none;
-  border-radius: 8px;
   color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
-pre {
-  background: #111;
-  padding: 12px;
-  border-radius: 8px;
-  overflow: auto;
-}
-
-header {
+.stats {
   display: flex;
-  justify-content: space-between;
-  padding: 15px;
+  padding: 20px;
 }
 
-.error {
-  color: #ff6b6b;
+.card {
+  background: #1b2040;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.logs {
+  padding: 20px;
+}
+
+.log {
+  display: flex;
+  align-items: center;
+  background: #1b2040;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.flag {
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.info {
+  flex: 1;
+}
+
+.time {
+  opacity: 0.6;
+  font-size: 12px;
 }
