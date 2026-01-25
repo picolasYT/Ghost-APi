@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .box {
+      background: #181818;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background: #7c3aed;
+      color: white;
+      cursor: pointer;
+    }
+    .error {
+      color: #ff5c5c;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>👻 Admin Login</h2>
+
+  <form method="POST" action="/api/admin/login">
+    <input
+      type="password"
+      name="password"
+      placeholder="Admin password"
+      required
+    >
+    <button type="submit">Entrar</button>
+  </form>
+
+  <div class="error">
+    <!-- aparece si error=1 -->
+  </div>
+</div>
+
+</body>
+</html>
