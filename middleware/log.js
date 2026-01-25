@@ -1,21 +1,19 @@
-import { pool } from "../db.js";
+const logs = [];
 
-export default async function logRequest(req, res, next) {
-  res.on("finish", async () => {
-    try {
-      await db.run(
-        "INSERT INTO logs (user_id, endpoint, ip, status) VALUES (?, ?, ?, ?)",
-        [
-          req.user?.id || null,
-          req.originalUrl,
-          req.ip,
-          res.statusCode < 400 ? "success" : "error"
-        ]
-      );
-    } catch (e) {
-      console.error("LOG ERROR", e.message);
-    }
+export default function logRequest(req, res, next) {
+  logs.push({
+    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+    path: req.originalUrl,
+    method: req.method,
+    ua: req.headers["user-agent"],
+    time: new Date().toISOString()
   });
 
+  // mantener solo últimos 500
+  if (logs.length > 500) logs.shift();
+
+  req.logs = logs;
   next();
 }
+
+export { logs };
