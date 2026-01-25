@@ -36,13 +36,45 @@ button {
   padding: 20px;
 }
 
+/* === LOG ITEM === */
 .log {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 90px;
+  gap: 12px;
   align-items: center;
-  background: #1b2040;
-  padding: 12px;
+
+  background: #151a3a;
   border-radius: 12px;
+  padding: 12px;
   margin-bottom: 10px;
+}
+
+/* info del log */
+.log .info {
+  overflow: hidden;
+}
+
+/* método + path */
+.log .info strong {
+  color: #7c7cff;
+}
+
+/* PATH CORTADO */
+.log .info .path {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #e5e7ff;
+}
+
+/* ip + ua */
+.log .info small {
+  display: block;
+  color: #9aa0ff;
+  opacity: 0.75;
+  font-size: 12px;
 }
 
 .flag {
