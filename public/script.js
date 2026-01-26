@@ -17,42 +17,21 @@ async function callApi(endpoint) {
 }
 
 /* =========================
-   MODAL YOUTUBE (API HELPER)
+   MODAL YOUTUBE
 ========================= */
 
 function openYTModal() {
   const modal = document.getElementById("ytModal");
-  if (!modal) return;
-
   modal.classList.remove("hidden");
-  document.getElementById("ytStatus").textContent = "";
+
   document.getElementById("ytUrl").value = "";
   document.getElementById("ytEndpoint").value = "";
+  document.getElementById("ytStatus").textContent = "";
+  document.getElementById("ytResponse").innerHTML = "";
 }
 
 function closeYTModal() {
-  const modal = document.getElementById("ytModal");
-  if (modal) modal.classList.add("hidden");
-}
-
-function submitYT() {
-  const urlInput = document.getElementById("ytUrl");
-  const status = document.getElementById("ytStatus");
-  const endpointInput = document.getElementById("ytEndpoint");
-
-  const url = urlInput.value.trim();
-
-  if (!url) {
-    status.textContent = "⚠️ Pegá una URL primero";
-    return;
-  }
-
-  // 👉 SOLO GENERA EL ENDPOINT (NO LLAMA A LA API)
-  const endpoint =
-    `https://ghost-api-wbqx.onrender.com/api/download/youtube?url=${encodeURIComponent(url)}`;
-
-  endpointInput.value = endpoint;
-  status.textContent = "✅ Endpoint generado";
+  document.getElementById("ytModal").classList.add("hidden");
 }
 
 function copyYTEndpoint() {
@@ -62,6 +41,173 @@ function copyYTEndpoint() {
   input.select();
   input.setSelectionRange(0, 99999);
   navigator.clipboard.writeText(input.value);
+}
+
+/* =========================
+   SUBMIT YOUTUBE (REAL)
+========================= */
+async function submitYT() {
+  const urlInput = document.getElementById("ytUrl");
+  const status = document.getElementById("ytStatus");
+  const output = document.getElementById("ytResponse");
+  const endpointInput = document.getElementById("ytEndpoint");
+
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    status.textContent = "⚠️ Pegá una URL primero";
+    return;
+  }
+
+  // Endpoint público
+  const endpoint =
+    `https://ghost-api-wbqx.onrender.com/api/download/youtube?url=${encodeURIComponent(url)}`;
+
+  endpointInput.value = endpoint;
+
+  status.textContent = "⏳ Processing request...";
+  output.innerHTML = "";
+
+  try {
+    const res = await fetch(`/api/download/youtube?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+
+    if (!data || data.error) {
+      status.textContent = "❌ Error";
+      output.innerHTML = `
+        <div style="color:#ffb4b4;">
+          ${data?.error || "No se pudo procesar YouTube"}
+        </div>
+      `;
+      return;
+    }
+
+    status.textContent = "✅ Success";
+
+    output.innerHTML = `
+      <p><strong>Título:</strong> ${data.title || "Sin título"}</p>
+      <p><strong>Canal:</strong> ${data.channel || "Desconocido"}</p>
+      <p style="font-size:13px;color:#bbb;">
+        Duración: ${data.duration || "N/D"}
+      </p>
+
+      ${
+        data.video
+          ? `
+        <video controls style="width:100%;border-radius:12px;margin-top:10px;">
+          <source src="${data.video}" type="video/mp4">
+        </video>
+
+        <div style="margin-top:12px;">
+          <a href="${data.video}" target="_blank">
+            <button>📥 Download Video</button>
+          </a>
+        </div>
+      `
+          : `<p style="color:#ffb4b4;">No se encontró video descargable</p>`
+      }
+    `;
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Error";
+    output.textContent = "Error al procesar la solicitud";
+  }
+}
+
+/* =========================
+   SUBMIT YOUTUBE (REAL)
+========================= */
+async function submitYT() {
+  const urlInput = document.getElementById("ytUrl");
+  const status = document.getElementById("ytStatus");
+  const output = document.getElementById("ytResponse");
+  const endpointInput = document.getElementById("ytEndpoint");
+
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    status.textContent = "⚠️ Pegá una URL primero";
+    return;
+  }
+
+  // Mostrar endpoint REAL
+  endpointInput.value =
+    `https://ghost-api-wbqx.onrender.com/api/download/youtube?url=${encodeURIComponent(url)}`;
+
+  status.textContent = "⏳ Processing request...";
+  output.innerHTML = "";
+
+  try {
+    const res = await fetch(
+      `/api/download/youtube?url=${encodeURIComponent(url)}`
+    );
+
+    const data = await res.json();
+
+    if (!data.ok || data.error) {
+      status.textContent = "❌ Error";
+      output.innerHTML = `
+        <div style="color:#ffb4b4;">
+          ${data.error || "No se pudo procesar YouTube"}
+        </div>
+      `;
+      return;
+    }
+
+    status.textContent = "✅ Success";
+
+    const videoUrl = data.video;
+
+    output.innerHTML = `
+      <p><strong>Título:</strong> ${data.title || "Sin título"}</p>
+      <p><strong>Canal:</strong> ${data.channel || "Desconocido"}</p>
+      <p style="font-size:13px;color:#bbb;">
+        Duración: ${data.duration ? data.duration + "s" : "N/D"}
+      </p>
+
+      ${
+        videoUrl
+          ? `
+      <video controls style="width:100%;border-radius:12px;margin-top:10px;">
+        <source src="${videoUrl}" type="video/mp4">
+        Tu navegador no soporta video.
+      </video>
+
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="${videoUrl}" target="_blank">
+          <button>📥 Download Video</button>
+        </a>
+      </div>
+      `
+          : `<p style="color:#ffb4b4;">No se encontró video descargable</p>`
+      }
+
+      ${
+        Array.isArray(data.alternatives) && data.alternatives.length
+          ? `
+          <details style="margin-top:12px;">
+            <summary>Otras calidades</summary>
+            <ul>
+              ${data.alternatives
+                .map(
+                  a =>
+                    `<li>
+                      ${a.quality || ""} –
+                      <a href="${a.url}" target="_blank">descargar</a>
+                    </li>`
+                )
+                .join("")}
+            </ul>
+          </details>
+          `
+          : ""
+      }
+    `;
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Error";
+    output.textContent = "Error al procesar la solicitud";
+  }
 }
 
 /* =========================
