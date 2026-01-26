@@ -3,37 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <title>Ghost Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS CORRECTO -->
+  <link rel="stylesheet" href="/admin/admin.css">
 </head>
+
 <body>
 
-<h2>Login Admin</h2>
+  <div class="card" style="max-width: 320px; margin: 120px auto; text-align:center;">
+    <h2>👻 Ghost Admin</h2>
 
-<input id="password" type="password" placeholder="password">
-<button id="btn">Entrar</button>
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+      style="
+        width:100%;
+        padding:10px;
+        border-radius:10px;
+        border:none;
+        margin:15px 0;
+      "
+    >
 
-<p id="error"></p>
+    <button id="btn" style="width:100%;">Entrar</button>
 
-<script>
-document.getElementById("btn").onclick = async () => {
-  const password = document.getElementById("password").value;
+    <p id="error" style="color:#ff7a7a; margin-top:10px;"></p>
+  </div>
 
-  const res = await fetch("/admin/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
+  <script>
+    document.getElementById("btn").onclick = async () => {
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("error");
 
-  const data = await res.json();
+      errorEl.textContent = "";
 
-  if (!res.ok) {
-    document.getElementById("error").textContent = "Password incorrecta";
-    return;
-  }
+      const res = await fetch("/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
 
-  localStorage.setItem("adminToken", data.token);
-  location.href = "/admin/dashboard.html";
-};
-</script>
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = "❌ Password incorrecta";
+        return;
+      }
+
+      localStorage.setItem("adminToken", data.token);
+      location.href = "/admin/dashboard.html";
+    };
+  </script>
 
 </body>
 </html>

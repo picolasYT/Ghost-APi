@@ -3,6 +3,10 @@ import adminAuth from "../middleware/adminAuth.js";
 
 const router = express.Router();
 
+// ⚠️ PASSWORD FIJA (hardcodeada)
+const ADMIN_PASSWORD = "ghostadmin123";
+const ADMIN_TOKEN = "ghost-token-123";
+
 /* LOGIN */
 router.post("/login", (req, res) => {
   const { password } = req.body;
@@ -11,13 +15,11 @@ router.post("/login", (req, res) => {
     return res.status(400).json({ error: "Falta password" });
   }
 
-  if (password !== process.env.ADMIN_PASSWORD) {
+  if (password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Password incorrecta" });
   }
 
-  return res.json({
-    token: process.env.ADMIN_TOKEN
-  });
+  return res.json({ token: ADMIN_TOKEN });
 });
 
 /* RUTA PROTEGIDA DE PRUEBA */

@@ -1,3 +1,5 @@
+const ADMIN_TOKEN = "ghost-token-123";
+
 export default function adminAuth(req, res, next) {
   const auth = req.headers.authorization;
 
@@ -7,7 +9,7 @@ export default function adminAuth(req, res, next) {
 
   const token = auth.replace("Bearer ", "");
 
-  if (token !== process.env.ADMIN_TOKEN) {
+  if (token !== ADMIN_TOKEN) {
     return res.status(403).json({ error: "Token inválido" });
   }
 
