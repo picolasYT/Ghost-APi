@@ -17,17 +17,17 @@ async function callApi(endpoint) {
 }
 
 /* =========================
-   MODAL YOUTUBE (MAINTENANCE)
+   MODAL YOUTUBE (API HELPER)
 ========================= */
+
 function openYTModal() {
   const modal = document.getElementById("ytModal");
   if (!modal) return;
 
   modal.classList.remove("hidden");
-  document.getElementById("ytStatus").textContent = "🚧 En mantenimiento";
-  document.getElementById("ytResponse").textContent =
-    "YouTube downloader está temporalmente deshabilitado.";
+  document.getElementById("ytStatus").textContent = "";
   document.getElementById("ytUrl").value = "";
+  document.getElementById("ytEndpoint").value = "";
 }
 
 function closeYTModal() {
@@ -35,13 +35,33 @@ function closeYTModal() {
   if (modal) modal.classList.add("hidden");
 }
 
-async function submitYT() {
+function submitYT() {
+  const urlInput = document.getElementById("ytUrl");
   const status = document.getElementById("ytStatus");
-  const output = document.getElementById("ytResponse");
+  const endpointInput = document.getElementById("ytEndpoint");
 
-  status.textContent = "🚧 YouTube está en mantenimiento";
-  output.textContent =
-    "Este endpoint está deshabilitado temporalmente. Usá TikTok.";
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    status.textContent = "⚠️ Pegá una URL primero";
+    return;
+  }
+
+  // 👉 SOLO GENERA EL ENDPOINT (NO LLAMA A LA API)
+  const endpoint =
+    `https://ghost-api-wbqx.onrender.com/api/download/youtube?url=${encodeURIComponent(url)}`;
+
+  endpointInput.value = endpoint;
+  status.textContent = "✅ Endpoint generado";
+}
+
+function copyYTEndpoint() {
+  const input = document.getElementById("ytEndpoint");
+  if (!input.value) return;
+
+  input.select();
+  input.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(input.value);
 }
 
 /* =========================
