@@ -1,57 +1,54 @@
-// Hecho por Picolas :3 — YouTube Downloader API
 import express from "express";
-import ytdl from "ytdl-core";
+import fetch from "node-fetch";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const { url } = req.query;
+const RAPID_HOST = "youtube138.p.rapidapi.com";
+const RAPID_KEY = process.env.RAPIDAPI_KEY; // ponela en Render
 
-  if (!url) {
+router.post("/videos", async (req, res) => {
+  const { id, filter = "videos_latest", cursor = "" } = req.body;
+
+  if (!id) {
     return res.status(400).json({
       ok: false,
-      error: "Falta el parámetro url"
-    });
-  }
-
-  if (!ytdl.validateURL(url)) {
-    return res.status(400).json({
-      ok: false,
-      error: "URL de YouTube inválida"
+      error: "Falta channel id"
     });
   }
 
   try {
-    const info = await ytdl.getInfo(url);
+    const response = await fetch(
+      `https://${RAPID_HOST}/channel/videos/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-rapidapi-host": RAPID_HOST,
+          "x-rapidapi-key": RAPID_KEY
+        },
+        body: JSON.stringify({
+          id,
+          filter,
+          cursor,
+          hl: "en",
+          gl: "US"
+        })
+      }
+    );
 
-    const formats = ytdl.filterFormats(info.formats, "videoandaudio");
-
-    // ordenar por calidad
-    formats.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
-
-    const best = formats[0];
+    const data = await response.json();
 
     return res.json({
       ok: true,
-      platform: "youtube",
-      creator: "Picolas",
-      videoId: info.videoDetails.videoId,
-      title: info.videoDetails.title,
-      duration: Number(info.videoDetails.lengthSeconds),
-      channel: info.videoDetails.author?.name || null,
-      video: best ? best.url : null,
-      alternatives: formats.slice(1, 5).map(f => ({
-        quality: f.qualityLabel,
-        mime: f.mimeType,
-        url: f.url
-      }))
+      source: "youtube138",
+      ...data
     });
 
   } catch (err) {
-    console.error("YouTube ERROR:", err.message);
-    return res.status(500).json({
+    console.error("YT CHANNEL ERROR:", err.message);
+    res.status(500).json({
       ok: false,
-      error: "Error procesando YouTube"
+      error: "Error obteniendo videos del canal"
     });
   }
 });
