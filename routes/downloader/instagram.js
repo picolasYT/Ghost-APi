@@ -1,14 +1,13 @@
-// Hecho por Picolas :3 — adaptado a Express
+// Hecho por Picolas :3 — API Instagram Downloader (backend-only)
 import express from "express";
 import axios from "axios";
 import * as cheerio from "cheerio";
 
 const router = express.Router();
-
 const LOCALE = "es";
 
 /* =========================
-   HELPERS (los tuyos)
+   HELPERS
 ========================= */
 
 function normalizeIgUrl(u = "") {
@@ -97,6 +96,7 @@ router.get("/", async (req, res) => {
     const html = String(response.data || "");
     const $ = cheerio.load(html);
 
+    // 🔹 Extraer TODOS los links
     const links = $(
       'a.download_link, a.type_videos, a[href*="ssscdn.io/reelsvideo/"]'
     )
@@ -107,24 +107,26 @@ router.get("/", async (req, res) => {
       .get()
       .filter(x => x.url);
 
-    const best =
-      links.find(x => /descargar\s*video/i.test(x.label)) ||
-      links.find(x => /video/i.test(x.label)) ||
-      links[0] ||
-      null;
+    // 🔹 FILTRO IMPORTANTE: SOLO VIDEOS REALES
+    const videoLinks = links.filter(x =>
+      /\.(mp4|webm|mov)(\?|$)/i.test(x.url)
+    );
+
+    const best = videoLinks[0] || null;
 
     const thumb =
       firstHttpUrl($("[data-bg]").first().attr("data-bg") || "") ||
       firstHttpUrl($(".bg-cover").first().attr("style") || "") ||
-      "";
+      null;
 
     const username = $(".text-400-16-18").first().text().trim() || null;
 
     return res.json({
-      ok: Boolean(best?.url),
+      ok: Boolean(best),
+      platform: "instagram",
       creator: "Picolas",
-      best,
-      links,
+      video: best ? best.url : null,
+      alternatives: videoLinks.slice(1).map(v => v.url),
       meta: {
         username,
         thumb
