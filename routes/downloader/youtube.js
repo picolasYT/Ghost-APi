@@ -3,36 +3,27 @@ import fetch from "node-fetch";
 
 const router = express.Router();
 
-const RAPID_HOST = "youtube138.p.rapidapi.com";
-const RAPID_KEY = process.env.RAPIDAPI_KEY; // ponela en Render
+const RAPID_HOST = "youtube-media-downloader.p.rapidapi.com";
+const RAPID_KEY = process.env.RAPIDAPI_KEY;
 
-router.post("/videos", async (req, res) => {
-  const { id, filter = "videos_latest", cursor = "" } = req.body;
+router.get("/posts", async (req, res) => {
+  const { channelId } = req.query;
 
-  if (!id) {
+  if (!channelId) {
     return res.status(400).json({
       ok: false,
-      error: "Falta channel id"
+      error: "Missing channelId"
     });
   }
 
   try {
     const response = await fetch(
-      `https://${RAPID_HOST}/channel/videos/`,
+      `https://${RAPID_HOST}/v2/channel/posts?channelId=${encodeURIComponent(channelId)}`,
       {
-        method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "x-rapidapi-host": RAPID_HOST,
           "x-rapidapi-key": RAPID_KEY
-        },
-        body: JSON.stringify({
-          id,
-          filter,
-          cursor,
-          hl: "en",
-          gl: "US"
-        })
+        }
       }
     );
 
@@ -40,15 +31,15 @@ router.post("/videos", async (req, res) => {
 
     return res.json({
       ok: true,
-      source: "youtube138",
+      source: "youtube-media-downloader",
       ...data
     });
 
   } catch (err) {
-    console.error("YT CHANNEL ERROR:", err.message);
+    console.error("YT POSTS ERROR:", err.message);
     res.status(500).json({
       ok: false,
-      error: "Error obteniendo videos del canal"
+      error: "Error fetching channel posts"
     });
   }
 });
