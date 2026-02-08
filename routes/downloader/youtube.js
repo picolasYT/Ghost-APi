@@ -1,62 +1,112 @@
-import express from "express";
-import axios from "axios";
+import express from "express"
+import ytdl from "ytdl-core"
 
-const router = express.Router();
+const router = express.Router()
 
-// ⚠️ Hardcode por ahora (después lo pasamos a env)
-const RAPID_HOST = "youtube-media-downloader.p.rapidapi.com";
-const RAPID_KEY = "814651014emsh71e028776d9a33dp1600e6jsn2e4b042ad0f6";
+// ─────────────────────────────
+// 🎥 INFO DEL VIDEO
+// /youtube/info?url=
+// ─────────────────────────────
+router.get("/info", async (req, res) => {
+  const { url } = req.query
 
-router.get("/posts", async (req, res) => {
-  const { channelId } = req.query;
-
-  if (!channelId) {
+  if (!url || !ytdl.validateURL(url)) {
     return res.status(400).json({
       ok: false,
-      error: "Missing channelId"
-    });
+      error: "Invalid or missing YouTube URL"
+    })
   }
 
   try {
-    const { data } = await axios.get(
-      `https://${RAPID_HOST}/v2/channel/posts`,
-      {
-        params: { channelId },
-        headers: {
-          "x-rapidapi-host": RAPID_HOST,
-          "x-rapidapi-key": RAPID_KEY,
-          "User-Agent": "Ghost-API/1.0"
-        },
-        timeout: 15000
-      }
-    );
-
-    // 🔽 Limpieza del response
-    const posts = (data.items || []).map(p => ({
-      id: p.id,
-      text: p.contentText || "",
-      published: p.publishedTimeText,
-      votes: p.voteCountText,
-      comments: p.commentCountText,
-      images: p.images?.[0]?.map(i => i.url) || [],
-      poll: p.poll || null
-    }));
+    const info = await ytdl.getInfo(url)
+    const v = info.videoDetails
 
     return res.json({
       ok: true,
-      channelId,
-      nextToken: data.nextToken || null,
-      count: posts.length,
-      posts
-    });
+      id: v.videoId,
+      title: v.title,
+      description: v.description,
+      duration: v.lengthSeconds,
+      views: v.viewCount,
+      author: v.author?.name,
+      channelId: v.author?.id,
+      thumbnail: v.thumbnails?.pop()?.url
+    })
 
   } catch (err) {
-    console.error("YT POSTS ERROR:", err.response?.data || err.message);
+    console.error("YT INFO ERROR:", err.message)
     return res.status(500).json({
       ok: false,
-      error: "Failed to fetch YouTube posts"
-    });
+      error: "Failed to fetch video info"
+    })
   }
-});
+})
 
-export default router;
+// ─────────────────────────────
+// 🎧 DESCARGA AUDIO MP3
+// /youtube/audio?url=
+// ─────────────────────────────
+router.get("/audio", async (req, res) => {
+  const { url } = req.query
+
+  if (!url || !ytdl.validateURL(url)) {
+    return res.status(400).json({
+      ok: false,
+      error: "Invalid or missing YouTube URL"
+    })
+  }
+
+  try {
+    const info = await ytdl.getInfo(url)
+    const title = info.videoDetails.title.replace(/[^\w\s]/gi, "")
+
+    res.setHeader("Content-Disposition", `attachment; filename="${title}.mp3"`)
+
+    ytdl(url, {
+      filter: "audioonly",
+      quality: "highestaudio"
+    }).pipe(res)
+
+  } catch (err) {
+    console.error("YT AUDIO ERROR:", err.message)
+    res.status(500).json({
+      ok: false,
+      error: "Failed to download audio"
+    })
+  }
+})
+
+// ─────────────────────────────
+// 📺 DESCARGA VIDEO MP4
+// /youtube/video?url=
+// ─────────────────────────────
+router.get("/video", async (req, res) => {
+  const { url } = req.query
+
+  if (!url || !ytdl.validateURL(url)) {
+    return res.status(400).json({
+      ok: false,
+      error: "Invalid or missing YouTube URL"
+    })
+  }
+
+  try {
+    const info = await ytdl.getInfo(url)
+    const title = info.videoDetails.title.replace(/[^\w\s]/gi, "")
+
+    res.setHeader("Content-Disposition", `attachment; filename="${title}.mp4"`)
+
+    ytdl(url, {
+      quality: "highestvideo"
+    }).pipe(res)
+
+  } catch (err) {
+    console.error("YT VIDEO ERROR:", err.message)
+    res.status(500).json({
+      ok: false,
+      error: "Failed to download video"
+    })
+  }
+})
+
+export default router
