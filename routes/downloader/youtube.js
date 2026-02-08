@@ -1,41 +1,46 @@
 import express from "express"
-import ytdl from "ytdl-core"
+import ytdlp from "youtube-dl-exec"
 
 const router = express.Router()
 
 // ─────────────────────────────
-// 🎥 INFO DEL VIDEO
-// /youtube/info?url=
+// 🎥 INFO VIDEO
 // ─────────────────────────────
 router.get("/info", async (req, res) => {
   const { url } = req.query
 
-  if (!url || !ytdl.validateURL(url)) {
+  if (!url) {
     return res.status(400).json({
       ok: false,
-      error: "Invalid or missing YouTube URL"
+      error: "Missing YouTube URL"
     })
   }
 
   try {
-    const info = await ytdl.getInfo(url)
-    const v = info.videoDetails
+    const info = await ytdlp(url, {
+      dumpSingleJson: true,
+      noWarnings: true,
+      noCheckCertificates: true,
+      preferFreeFormats: true,
+      addHeader: [
+        "User-Agent:Mozilla/5.0"
+      ]
+    })
 
     return res.json({
       ok: true,
-      id: v.videoId,
-      title: v.title,
-      description: v.description,
-      duration: v.lengthSeconds,
-      views: v.viewCount,
-      author: v.author?.name,
-      channelId: v.author?.id,
-      thumbnail: v.thumbnails?.pop()?.url
+      id: info.id,
+      title: info.title,
+      duration: info.duration,
+      views: info.view_count,
+      channel: info.uploader,
+      channelId: info.channel_id,
+      thumbnail: info.thumbnail
     })
 
   } catch (err) {
-    console.error("YT INFO ERROR:", err.message)
-    return res.status(500).json({
+    console.error("YT-DLP INFO ERROR:", err.stderr || err.message)
+    res.status(500).json({
       ok: false,
       error: "Failed to fetch video info"
     })
@@ -43,32 +48,30 @@ router.get("/info", async (req, res) => {
 })
 
 // ─────────────────────────────
-// 🎧 DESCARGA AUDIO MP3
-// /youtube/audio?url=
+// 🎧 AUDIO
 // ─────────────────────────────
 router.get("/audio", async (req, res) => {
   const { url } = req.query
 
-  if (!url || !ytdl.validateURL(url)) {
-    return res.status(400).json({
-      ok: false,
-      error: "Invalid or missing YouTube URL"
-    })
+  if (!url) {
+    return res.status(400).json({ ok: false, error: "Missing URL" })
   }
 
   try {
-    const info = await ytdl.getInfo(url)
-    const title = info.videoDetails.title.replace(/[^\w\s]/gi, "")
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="audio.mp3"'
+    )
 
-    res.setHeader("Content-Disposition", `attachment; filename="${title}.mp3"`)
-
-    ytdl(url, {
-      filter: "audioonly",
-      quality: "highestaudio"
-    }).pipe(res)
+    ytdlp.exec(url, {
+      extractAudio: true,
+      audioFormat: "mp3",
+      output: "-",
+      noWarnings: true
+    }).stdout.pipe(res)
 
   } catch (err) {
-    console.error("YT AUDIO ERROR:", err.message)
+    console.error("YT-DLP AUDIO ERROR:", err.stderr || err.message)
     res.status(500).json({
       ok: false,
       error: "Failed to download audio"
@@ -77,31 +80,29 @@ router.get("/audio", async (req, res) => {
 })
 
 // ─────────────────────────────
-// 📺 DESCARGA VIDEO MP4
-// /youtube/video?url=
+// 📺 VIDEO
 // ─────────────────────────────
 router.get("/video", async (req, res) => {
   const { url } = req.query
 
-  if (!url || !ytdl.validateURL(url)) {
-    return res.status(400).json({
-      ok: false,
-      error: "Invalid or missing YouTube URL"
-    })
+  if (!url) {
+    return res.status(400).json({ ok: false, error: "Missing URL" })
   }
 
   try {
-    const info = await ytdl.getInfo(url)
-    const title = info.videoDetails.title.replace(/[^\w\s]/gi, "")
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="video.mp4"'
+    )
 
-    res.setHeader("Content-Disposition", `attachment; filename="${title}.mp4"`)
-
-    ytdl(url, {
-      quality: "highestvideo"
-    }).pipe(res)
+    ytdlp.exec(url, {
+      format: "mp4",
+      output: "-",
+      noWarnings: true
+    }).stdout.pipe(res)
 
   } catch (err) {
-    console.error("YT VIDEO ERROR:", err.message)
+    console.error("YT-DLP VIDEO ERROR:", err.stderr || err.message)
     res.status(500).json({
       ok: false,
       error: "Failed to download video"

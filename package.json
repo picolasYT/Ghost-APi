@@ -20,7 +20,7 @@
     "pg": "^8.17.2",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "yt-dlp-wrap": "^2.3.12",
-    "ytdl-core": "^4.11.5"
+    "youtube-dl-exec": "^3.0.30",
+    "yt-dlp-wrap": "^2.3.12"
   }
 }
